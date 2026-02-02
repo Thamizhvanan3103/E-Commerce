@@ -1,0 +1,106 @@
+import { Typography } from "@mui/material";
+import { useState } from "react";
+import React from "react";
+import { Grid, Paper, TextField, Button } from "@mui/material";
+import { useForm } from "react-hook-form";
+import * as Yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+let renderCount = 0;
+
+let schema = Yup.object().shape({
+  name: Yup.string()
+    .required("Name is Required")
+    .matches(/^[A-Z][a-z]+ [A-Z][a-z]+$/, "Enter Your Fullname"),
+  email: Yup.string()
+    .email()
+    .required("Email is Required")
+    .matches(
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+      "Enter a valid Email",
+    ),
+    age: Yup.number()
+    .integer()
+    .positive()
+    .required("Enter Your Age")
+    .min(16, "Enter Age between 16 to 50")
+    .max(50, "Enter Age between 16 to 50"),
+    password : Yup.string().required( "Password is Required"),
+    cPassword : Yup.string().oneOf( [Yup.ref("password"), null], "Password Must Match")
+});
+
+const SignUp = () => {
+  let paperStyle = {
+    width: 400,
+    margin: "20px auto",
+    padding: "20px",
+    display: "grid",
+    gap: "20px",
+  };
+
+  renderCount++;
+
+  let [input, setInput] = useState("");
+
+  let {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+  console.log(errors);
+
+  let handleData = (data) => {
+    console.log(data);
+  };
+  return (
+    <Paper
+      elevation={20}
+      style={paperStyle}
+      component="form"
+      onSubmit={handleSubmit(handleData)}
+    >
+      <Typography textAlign="center" variant="h6">
+        {" "}
+        Create Account 
+      </Typography>
+      <TextField
+        label="Name"
+        {...register("name")}
+        error={!!errors.name}
+        helperText={errors.name?.message}
+      />
+      <TextField
+        label="Email"
+        {...register("email")}
+        error={!!errors.email}
+        helperText={errors.email?.message}
+      />
+      <TextField
+        label="Age"
+        {...register("age")}
+        error={!!errors.age}
+        helperText={errors.age?.message}
+      />
+      <TextField
+        label="Password"
+        {...register("password")}
+        error={!!errors.password}
+        helperText={errors.password?.message}
+      />
+      <TextField
+        label="Confirm Password"
+        {...register("cPassword")}
+        error={!!errors.cPassword}
+        helperText={errors.cPassword?.message}
+      />
+      <Button variant="contained" type="submit">
+        {" "}
+        SignUp{" "}
+      </Button>
+    </Paper>
+  );
+};
+
+export default SignUp;
